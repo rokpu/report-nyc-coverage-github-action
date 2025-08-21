@@ -107,6 +107,14 @@ async function run() {
   }
   commentBody += '\n' + commentMark + '\n';
 
+  // Truncate comment body if it exceeds GitHub's limit
+  const MAX_COMMENT_LENGTH = 65536;
+  if (commentBody.length > MAX_COMMENT_LENGTH) {
+    const truncationMessage = '\n\n⚠️ **Note:** This coverage report has been truncated due to GitHub comment size limits. Full report available in the GitHub Action logs.';
+    const availableLength = MAX_COMMENT_LENGTH - truncationMessage.length;
+    commentBody = commentBody.substring(0, availableLength) + truncationMessage;
+  }
+
   const commentMode = core.getInput(ActionInput.comment_mode);
 
   const octokit = await github.getOctokit(gitHubToken);
